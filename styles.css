@@ -1,0 +1,93 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  width: 240px;
+  background: #1a1a1a;
+  color: #ffffff;
+}
+
+.container {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+h1 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #e0e0e0;
+}
+
+.status {
+  text-align: center;
+  width: 100%;
+}
+
+.usage-display {
+  font-size: 48px;
+  font-weight: 700;
+  margin: 8px 0;
+  transition: color 0.3s ease;
+}
+
+.usage-display .percent-sign {
+  font-size: 24px;
+  font-weight: 400;
+  opacity: 0.7;
+}
+
+.usage-green {
+  color: #4CAF50;
+}
+
+.usage-orange {
+  color: #FF9800;
+}
+
+.usage-red {
+  color: #F44336;
+}
+
+.usage-gray {
+  color: #999999;
+}
+
+#status-text {
+  font-size: 13px;
+  color: #a0a0a0;
+  margin-bottom: 4px;
+}
+
+.last-updated {
+  font-size: 11px;
+  color: #666666;
+}
+
+.auto-update-info {
+  font-size: 11px;
+  color: #555555;
+  padding: 8px 12px;
+  background: #252525;
+  border-radius: 4px;
+  width: 100%;
+  text-align: center;
+}
+
+.settings-link {
+  font-size: 12px;
+  color: #888888;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.settings-link:hover {
+  color: #ffffff;
+  text-decoration: underline;
+}

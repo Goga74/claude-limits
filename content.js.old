@@ -1,0 +1,54 @@
+// Content script for parsing Claude usage page
+
+function parseUsage() {
+  // Only parse on the usage settings page
+  if (!window.location.href.includes('claude.ai/settings/usage')) {
+    return null;
+  }
+
+  const paragraphs = document.querySelectorAll('p');
+  const percentRegex = /(\d+)% used/;
+
+  for (const p of paragraphs) {
+    const match = p.textContent.match(percentRegex);
+    if (match) {
+      const percent = parseInt(match[1], 10);
+      return {
+        loggedIn: true,
+        percent: percent
+      };
+    }
+  }
+
+  // No "% used" found - user might not be logged in
+  return {
+    loggedIn: false,
+    percent: 0
+  };
+}
+
+function sendUsageData() {
+  const data = parseUsage();
+  if (data !== null) {
+    chrome.runtime.sendMessage({
+      type: 'USAGE_DATA',
+      data: data
+    });
+  }
+}
+
+// Parse when page is ready
+if (document.readyState === 'complete') {
+  sendUsageData();
+} else {
+  window.addEventListener('load', sendUsageData);
+}
+
+// Listen for manual refresh requests from popup
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.type === 'REFRESH_USAGE') {
+    const data = parseUsage();
+    sendResponse(data);
+  }
+  return true;
+});

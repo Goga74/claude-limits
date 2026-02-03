@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>0Tokens</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Claude Usage</h1>
+    <div id="status" class="status">
+      <div id="usage-display" class="usage-display">
+        <span id="percent-value">--</span>
+        <span class="percent-sign">%</span>
+      </div>
+      <p id="status-text">Loading...</p>
+      <p id="last-updated" class="last-updated"></p>
+    </div>
+    <p class="auto-update-info">Auto-updates every 5 minutes</p>
+    <a href="https://claude.ai/settings/usage" target="_blank" class="settings-link">Open Usage Page</a>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
