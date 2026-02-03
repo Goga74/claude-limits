@@ -17,8 +17,7 @@ A Chrome extension that displays your Claude AI usage limits directly in the bro
 ## Screenshots
 
 <!-- Add screenshots here -->
-![Badge Example](screenshots/badge-example.png)
-![Popup View](screenshots/popup-view.png)
+![Badge Example](screenshots/Claude_Limits.png)
 
 ## Installation
 
