@@ -91,3 +91,20 @@ h1 {
   color: #ffffff;
   text-decoration: underline;
 }
+
+.author {
+  font-size: 10px;
+  color: #444444;
+  margin-top: 4px;
+}
+
+.author-link {
+  color: #5a5a5a;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.author-link:hover {
+  color: #0a66c2;
+  text-decoration: underline;
+}

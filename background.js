@@ -17,7 +17,6 @@ chrome.alarms.create('autoUpdate', { periodInMinutes: 5 });
 chrome.runtime.onInstalled.addListener(() => {
   chrome.action.setTitle({ title: "Claude Usage" });
   initializeBadge();
-  // Delay first auto-update to let extension fully initialize
   setTimeout(() => {
     updateUsageData();
   }, 3000);
@@ -39,20 +38,34 @@ chrome.alarms.onAlarm.addListener((alarm) => {
 
 async function updateUsageData() {
   try {
-    // Open usage page in background
-    const tab = await chrome.tabs.create({
-      url: 'https://claude.ai/settings/usage',
-      active: false
+    // Check if there's already an open claude.ai/settings/usage tab
+    const existingTabs = await chrome.tabs.query({
+      url: 'https://claude.ai/settings/usage*'
     });
 
-    // Wait 6 seconds for page to load and content script to parse, then close tab
+    if (existingTabs.length > 0) {
+      await chrome.tabs.reload(existingTabs[0].id);
+      return;
+    }
+
+    // Create a minimized window with the usage page (invisible to user)
+    const win = await chrome.windows.create({
+      url: 'https://claude.ai/settings/usage',
+      type: 'popup',
+      state: 'minimized',
+      width: 800,
+      height: 600,
+      focused: false
+    });
+
+    // Safety timeout: close window after 10 seconds even if no data received
     setTimeout(async () => {
       try {
-        await chrome.tabs.remove(tab.id);
+        await chrome.windows.remove(win.id);
       } catch (e) {
-        // Tab might be already closed
+        // Window might be already closed by onMessage handler
       }
-    }, 6000);
+    }, 10000);
 
   } catch (error) {
     console.error('Error updating usage:', error);
@@ -65,10 +78,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     const data = message.data;
 
     if (data.loggedIn) {
-      // Update badge
       updateBadge(data.percent);
 
-      // Save to storage
       chrome.storage.local.set({
         usageData: {
           ...data,
@@ -76,10 +87,18 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         }
       });
 
-      // Check for notifications
       checkAndNotify(data.percent);
+
+      // Close the minimized popup window as soon as data is received
+      if (sender.tab) {
+        chrome.windows.get(sender.tab.windowId, (win) => {
+          if (chrome.runtime.lastError) return;
+          if (win && win.state === 'minimized' && win.type === 'popup') {
+            chrome.windows.remove(win.id).catch(() => {});
+          }
+        });
+      }
     } else {
-      // Not logged in
       chrome.action.setBadgeText({ text: '?' });
       chrome.action.setBadgeBackgroundColor({ color: COLORS.GRAY });
     }
@@ -100,7 +119,6 @@ function updateBadge(percent) {
 }
 
 function checkAndNotify(percent) {
-  // Notify at 80%, 90%, 95%
   const levels = [
     { threshold: 80, id: 'limit80', message: "You've used 80% of your Claude limit" },
     { threshold: 90, id: 'limit90', message: "You've used 90% of your Claude limit" },
@@ -121,7 +139,6 @@ function checkAndNotify(percent) {
     }
   }
 
-  // Reset notification level if usage dropped (new billing cycle)
   if (percent < 80) {
     lastNotificationLevel = 0;
   }
