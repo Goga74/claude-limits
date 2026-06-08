@@ -58,3 +58,7 @@ coverage/
 # Cache
 .cache/
 .parcel-cache/
+
+# Internal working notes (not for publication; /docs is served by GitHub Pages)
+docs/PROJECT_STATE.md
+docs/WEBSTORE_LISTING.md
