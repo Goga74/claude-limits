@@ -1,73 +1,67 @@
 # Privacy Policy — 0Tokens
 
-**Last updated:** 2026-06-08
+**Last updated:** 2026-06-09 / Applies to version 1.2.0
 
-**0Tokens** ("the Extension") is a Chrome browser extension that displays your
-Claude AI usage limit directly on the browser toolbar badge. This policy
-explains what the Extension does and does not do with your data.
+**Short version:** 0Tokens runs entirely inside your browser. It does not
+collect, store off your device, transmit, sell, or share any personal data.
+There are no servers, no analytics, and no third parties involved.
 
-## Summary
+## What the extension does
 
-The Extension does **not** collect, transmit, sell, or share any personal data.
-Everything it reads stays **on your own device**.
+0Tokens reads a single value — your usage percentage ("X% used") — from the
+Claude usage page (`https://claude.ai/settings/usage`) and displays it to you
+locally as a badge on the toolbar icon. Its only purpose is to show you your
+own usage status. It does not read, modify, copy, or forward the content of
+your conversations or any other page.
 
-## What data the Extension accesses
+## Data we collect
 
-The Extension reads a **single number** from the Claude usage page
-(`https://claude.ai/settings/usage`): the usage percentage shown as
-"X% used". To do this it:
+None that leaves your device. 0Tokens only reads the usage percentage needed
+to display your status, and that processing happens locally in your browser.
+The extension does not send any data to the developer or to any third party.
+There is no remote server, no account, no tracking, and no telemetry.
 
-- Runs a content script on `https://claude.ai/*` pages that looks for the
-  "X% used" text and extracts the integer percentage.
-- Periodically (every 5 minutes) opens the usage page in a background browser
-  window to refresh that number, then closes the window automatically.
+## Local storage
 
-The Extension does **not** read your conversations, account details, email,
-name, payment information, or any other content from Claude or any other site.
+The only data stored is your most recent usage **percentage** (an integer) and
+a **timestamp** of when it was last read. This is kept locally on your device
+using `chrome.storage.local` and is never transmitted. You can clear it at any
+time by removing the extension.
 
-## What data is stored
+## Permissions and why they are used
 
-The only data stored is:
+- `host access to https://claude.ai/*` — to read the "X% used" value from the
+  Claude usage page so it can be displayed to you.
+- `tabs` — to find and reload your Claude usage tab, or open and then close a
+  temporary background window with the usage page, so the badge can be
+  refreshed. The extension does not read the contents of unrelated tabs.
+- `storage` — to keep the latest usage percentage and timestamp locally on your
+  device.
+- `alarms` — to schedule an automatic refresh of the usage percentage every 5
+  minutes.
+- `notifications` — to show a local desktop alert when usage reaches 80%, 90%,
+  and 95%.
 
-- The most recent usage **percentage** (an integer, e.g. `42`).
-- A **timestamp** of when it was last updated.
+## Data sharing and sale
 
-This is saved using `chrome.storage.local`, which keeps the data **locally in
-your browser on your device**. It is never uploaded anywhere.
+0Tokens does not share, sell, rent, or transfer any user data to anyone, for
+any purpose.
 
-## What data is transmitted
+## Children
 
-**None.** The Extension contains no analytics, no tracking, and no external
-servers. It does not send your data to the developer or to any third party.
-The only website it interacts with is `claude.ai`, which you are already using.
-
-## Permissions and why they are needed
-
-| Permission | Purpose |
-|------------|---------|
-| `storage` | Save the latest usage percentage locally between sessions. |
-| `tabs` | Open/refresh/close the Claude usage page in the background to read the percentage. |
-| `alarms` | Schedule the periodic (5-minute) refresh. |
-| `notifications` | Show a local desktop alert when usage reaches 80% / 90% / 95%. |
-| `host_permissions: https://claude.ai/*` | Read the "X% used" value from the Claude usage page. |
-
-## Third parties
-
-The Extension does not use any third-party services, SDKs, analytics, or
-advertising. No data is shared with anyone.
-
-## Children's privacy
-
-The Extension is not directed at children and collects no personal data from
-anyone.
+0Tokens is a general-purpose developer tool and is not directed at children
+under 13.
 
 ## Changes to this policy
 
-If this policy changes, the updated version will be published in the
-Extension's repository with a new "Last updated" date.
+If this policy changes, the updated version will be posted at this address with
+a new "Last updated" date.
 
 ## Contact
 
-For questions about this policy, contact: **capra.lanigera@gmail.com**
+Questions about this policy can be sent to capra.lanigera@gmail.com.
 
-Repository: https://github.com/Goga74/claude-limits
+---
+
+0Tokens browser extension · [github.com/Goga74/claude-limits](https://github.com/Goga74/claude-limits)
+This page is served as static content and loads no external resources.

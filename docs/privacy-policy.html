@@ -1,85 +1,184 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Privacy Policy — 0Tokens</title>
-  <style>
-    body { font-family: -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-           max-width: 760px; margin: 40px auto; padding: 0 16px; line-height: 1.6;
-           color: #1a1a1a; }
-    h1 { color: #CC785C; }
-    h2 { margin-top: 1.8em; border-bottom: 1px solid #eee; padding-bottom: 4px; }
-    table { border-collapse: collapse; width: 100%; margin: 12px 0; }
-    th, td { border: 1px solid #ddd; padding: 8px 10px; text-align: left; }
-    th { background: #f7f7f7; }
-    code { background: #f2f2f2; padding: 1px 5px; border-radius: 4px; }
-    .updated { color: #666; font-size: 0.9em; }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>0Tokens - Privacy Policy</title>
+<meta name="description" content="Privacy policy for the 0Tokens browser extension. The extension does not collect, transmit, sell, or share any user data.">
+<style>
+  :root {
+    --ink: #1a1916;
+    --muted: #6b675f;
+    --paper: #faf8f3;
+    --line: #e4ded2;
+    --accent: #c2410c;
+    --code-bg: #f0ece2;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Iowan Old Style", "Charter", Georgia, "Times New Roman", serif;
+    font-size: 18px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 64px 24px 96px;
+  }
+  .mark {
+    font-family: ui-monospace, "SF Mono", "IBM Plex Mono", "Menlo", monospace;
+    font-size: 15px;
+    letter-spacing: 0.04em;
+    color: var(--ink);
+    display: inline-block;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 6px 12px;
+    background: #fff;
+  }
+  .mark b { color: var(--accent); font-weight: 700; }
+  h1 {
+    font-size: 38px;
+    line-height: 1.1;
+    margin: 28px 0 6px;
+    letter-spacing: -0.01em;
+  }
+  .updated {
+    font-family: ui-monospace, "SF Mono", "IBM Plex Mono", "Menlo", monospace;
+    font-size: 13px;
+    color: var(--muted);
+    margin: 0 0 36px;
+  }
+  .tldr {
+    border-left: 3px solid var(--accent);
+    background: #fff;
+    padding: 18px 22px;
+    margin: 0 0 44px;
+    border-radius: 0 8px 8px 0;
+    font-size: 17px;
+  }
+  .tldr strong { font-weight: 700; }
+  h2 {
+    font-size: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-family: ui-monospace, "SF Mono", "IBM Plex Mono", "Menlo", monospace;
+    color: var(--muted);
+    margin: 48px 0 14px;
+    padding-top: 18px;
+    border-top: 1px solid var(--line);
+    font-weight: 600;
+  }
+  p { margin: 0 0 16px; }
+  ul { margin: 0 0 16px; padding-left: 22px; }
+  li { margin-bottom: 8px; }
+  code {
+    font-family: ui-monospace, "SF Mono", "IBM Plex Mono", "Menlo", monospace;
+    font-size: 0.86em;
+    background: var(--code-bg);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+  a { color: var(--accent); text-decoration: none; border-bottom: 1px solid rgba(194,65,12,0.35); }
+  a:hover { border-bottom-color: var(--accent); }
+  footer {
+    margin-top: 56px;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+    font-size: 14px;
+    color: var(--muted);
+  }
+  @media (max-width: 520px) {
+    body { font-size: 17px; }
+    .wrap { padding: 44px 20px 72px; }
+    h1 { font-size: 30px; }
+  }
+</style>
 </head>
 <body>
-  <h1>Privacy Policy — 0Tokens</h1>
-  <p class="updated"><strong>Last updated:</strong> 2026-06-08</p>
+  <main class="wrap">
+    <span class="mark"><b>0</b>Tokens</span>
+    <h1>Privacy Policy</h1>
+    <p class="updated">Last updated: 2026-06-09 / Applies to version 1.2.0</p>
 
-  <p><strong>0Tokens</strong> ("the Extension") is a Chrome browser extension that
-  displays your Claude AI usage limit directly on the browser toolbar badge.
-  This policy explains what the Extension does and does not do with your data.</p>
+    <div class="tldr">
+      <strong>Short version:</strong> 0Tokens runs entirely inside your browser. It does not
+      collect, store off your device, transmit, sell, or share any personal data. There are no
+      servers, no analytics, and no third parties involved.
+    </div>
 
-  <h2>Summary</h2>
-  <p>The Extension does <strong>not</strong> collect, transmit, sell, or share any
-  personal data. Everything it reads stays <strong>on your own device</strong>.</p>
+    <h2>What the extension does</h2>
+    <p>
+      0Tokens reads a single value &mdash; your usage percentage (&ldquo;X% used&rdquo;) &mdash;
+      from the Claude usage page (<code>https://claude.ai/settings/usage</code>) and displays it
+      to you locally as a badge on the toolbar icon. Its only purpose is to show you your own
+      usage status. It does not read, modify, copy, or forward the content of your conversations
+      or any other page.
+    </p>
 
-  <h2>What data the Extension accesses</h2>
-  <p>The Extension reads a <strong>single number</strong> from the Claude usage page
-  (<code>https://claude.ai/settings/usage</code>): the usage percentage shown as
-  "X% used". To do this it:</p>
-  <ul>
-    <li>Runs a content script on <code>https://claude.ai/*</code> pages that looks
-    for the "X% used" text and extracts the integer percentage.</li>
-    <li>Periodically (every 5 minutes) opens the usage page in a background browser
-    window to refresh that number, then closes the window automatically.</li>
-  </ul>
-  <p>The Extension does <strong>not</strong> read your conversations, account
-  details, email, name, payment information, or any other content from Claude or
-  any other site.</p>
+    <h2>Data we collect</h2>
+    <p>
+      None that leaves your device. 0Tokens only reads the usage percentage needed to display
+      your status, and that processing happens locally in your browser. The extension does not
+      send any data to the developer or to any third party. There is no remote server, no
+      account, no tracking, and no telemetry.
+    </p>
 
-  <h2>What data is stored</h2>
-  <ul>
-    <li>The most recent usage <strong>percentage</strong> (an integer, e.g. <code>42</code>).</li>
-    <li>A <strong>timestamp</strong> of when it was last updated.</li>
-  </ul>
-  <p>This is saved using <code>chrome.storage.local</code>, which keeps the data
-  <strong>locally in your browser on your device</strong>. It is never uploaded anywhere.</p>
+    <h2>Local storage</h2>
+    <p>
+      The only data stored is your most recent usage <strong>percentage</strong> (an integer) and
+      a <strong>timestamp</strong> of when it was last read. This is kept locally on your device
+      using <code>chrome.storage.local</code> and is never transmitted. You can clear it at any
+      time by removing the extension.
+    </p>
 
-  <h2>What data is transmitted</h2>
-  <p><strong>None.</strong> The Extension contains no analytics, no tracking, and no
-  external servers. It does not send your data to the developer or to any third
-  party. The only website it interacts with is <code>claude.ai</code>, which you
-  are already using.</p>
+    <h2>Permissions and why they are used</h2>
+    <ul>
+      <li><code>host access to https://claude.ai/*</code> &mdash; to read the &ldquo;X% used&rdquo;
+        value from the Claude usage page so it can be displayed to you.</li>
+      <li><code>tabs</code> &mdash; to find and reload your Claude usage tab, or open and then
+        close a temporary background window with the usage page, so the badge can be refreshed.
+        The extension does not read the contents of unrelated tabs.</li>
+      <li><code>storage</code> &mdash; to keep the latest usage percentage and timestamp locally
+        on your device.</li>
+      <li><code>alarms</code> &mdash; to schedule an automatic refresh of the usage percentage
+        every 5 minutes.</li>
+      <li><code>notifications</code> &mdash; to show a local desktop alert when usage reaches
+        80%, 90%, and 95%.</li>
+    </ul>
 
-  <h2>Permissions and why they are needed</h2>
-  <table>
-    <tr><th>Permission</th><th>Purpose</th></tr>
-    <tr><td><code>storage</code></td><td>Save the latest usage percentage locally between sessions.</td></tr>
-    <tr><td><code>tabs</code></td><td>Open/refresh/close the Claude usage page in the background to read the percentage.</td></tr>
-    <tr><td><code>alarms</code></td><td>Schedule the periodic (5-minute) refresh.</td></tr>
-    <tr><td><code>notifications</code></td><td>Show a local desktop alert when usage reaches 80% / 90% / 95%.</td></tr>
-    <tr><td><code>host_permissions: https://claude.ai/*</code></td><td>Read the "X% used" value from the Claude usage page.</td></tr>
-  </table>
+    <h2>Data sharing and sale</h2>
+    <p>
+      0Tokens does not share, sell, rent, or transfer any user data to anyone, for any purpose.
+    </p>
 
-  <h2>Third parties</h2>
-  <p>The Extension does not use any third-party services, SDKs, analytics, or
-  advertising. No data is shared with anyone.</p>
+    <h2>Children</h2>
+    <p>
+      0Tokens is a general-purpose developer tool and is not directed at children under 13.
+    </p>
 
-  <h2>Children's privacy</h2>
-  <p>The Extension is not directed at children and collects no personal data from anyone.</p>
+    <h2>Changes to this policy</h2>
+    <p>
+      If this policy changes, the updated version will be posted at this address with a new
+      &ldquo;Last updated&rdquo; date.
+    </p>
 
-  <h2>Changes to this policy</h2>
-  <p>If this policy changes, the updated version will be published in the
-  Extension's repository with a new "Last updated" date.</p>
+    <h2>Contact</h2>
+    <p>
+      Questions about this policy can be sent to
+      <a href="mailto:capra.lanigera@gmail.com">capra.lanigera@gmail.com</a>.
+    </p>
 
-  <h2>Contact</h2>
-  <p>For questions about this policy, contact: <strong>capra.lanigera@gmail.com</strong></p>
-  <p>Repository: <a href="https://github.com/Goga74/claude-limits">https://github.com/Goga74/claude-limits</a></p>
+    <footer>
+      0Tokens browser extension &middot;
+      <a href="https://github.com/Goga74/claude-limits">github.com/Goga74/claude-limits</a><br>
+      This page is served as static content and loads no external resources.
+    </footer>
+  </main>
 </body>
 </html>
