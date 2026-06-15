@@ -48,22 +48,18 @@ async function updateUsageData() {
       return;
     }
 
-    // Create a minimized window with the usage page (invisible to user)
-    const win = await chrome.windows.create({
+    // Open usage page in a background tab (invisible to user)
+    const tab = await chrome.tabs.create({
       url: 'https://claude.ai/settings/usage',
-      type: 'popup',
-      state: 'minimized',
-      width: 800,
-      height: 600,
-      focused: false
+      active: false
     });
 
-    // Safety timeout: close window after 10 seconds even if no data received
+    // Safety timeout: close tab after 10 seconds even if no data received
     setTimeout(async () => {
       try {
-        await chrome.windows.remove(win.id);
+        await chrome.tabs.remove(tab.id);
       } catch (e) {
-        // Window might be already closed by onMessage handler
+        // Tab might be already closed by onMessage handler
       }
     }, 10000);
 
@@ -89,14 +85,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
       checkAndNotify(data.percent);
 
-      // Close the minimized popup window as soon as data is received
+      // Close the background tab as soon as data is received
       if (sender.tab) {
-        chrome.windows.get(sender.tab.windowId, (win) => {
-          if (chrome.runtime.lastError) return;
-          if (win && win.state === 'minimized' && win.type === 'popup') {
-            chrome.windows.remove(win.id).catch(() => {});
-          }
-        });
+        try {
+          chrome.tabs.remove(sender.tab.id).catch(() => {});
+        } catch (e) {
+          // Tab might be already closed
+        }
       }
     } else {
       chrome.action.setBadgeText({ text: '?' });
