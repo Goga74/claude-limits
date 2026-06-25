@@ -1,9 +1,16 @@
 // Popup script for displaying usage data
 
+import { clampThreshold } from './lib.js';
+
 const percentValue = document.getElementById('percent-value');
 const statusText = document.getElementById('status-text');
 const lastUpdated = document.getElementById('last-updated');
 const usageDisplay = document.getElementById('usage-display');
+const notifyEnabledEl = document.getElementById('notify-enabled');
+const notifyThresholdEl = document.getElementById('notify-threshold');
+
+const DEFAULT_NOTIFY_ENABLED = true;
+const DEFAULT_NOTIFY_THRESHOLD = 80;
 
 function getUsageClass(percent) {
   if (percent <= 50) return 'usage-green';
@@ -53,5 +60,32 @@ function loadStoredData() {
   });
 }
 
+// --- Notification settings ---
+
+function loadSettings() {
+  chrome.storage.local.get(['notifyEnabled', 'notifyThreshold'], (result) => {
+    const enabled = result.notifyEnabled !== undefined
+      ? result.notifyEnabled
+      : DEFAULT_NOTIFY_ENABLED;
+    const threshold = result.notifyThreshold !== undefined
+      ? clampThreshold(result.notifyThreshold)
+      : DEFAULT_NOTIFY_THRESHOLD;
+
+    notifyEnabledEl.checked = enabled;
+    notifyThresholdEl.value = threshold;
+  });
+}
+
+notifyEnabledEl.addEventListener('change', () => {
+  chrome.storage.local.set({ notifyEnabled: notifyEnabledEl.checked });
+});
+
+notifyThresholdEl.addEventListener('change', () => {
+  const value = clampThreshold(notifyThresholdEl.value);
+  notifyThresholdEl.value = value; // reflect the clamped/normalized value back to the UI
+  chrome.storage.local.set({ notifyThreshold: value });
+});
+
 // Initialize
 loadStoredData();
+loadSettings();

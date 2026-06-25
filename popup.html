@@ -17,12 +17,22 @@
       <p id="status-text">Loading...</p>
       <p id="last-updated" class="last-updated"></p>
     </div>
+    <div class="settings-panel">
+      <label class="setting-row">
+        <span>Notify me</span>
+        <input type="checkbox" id="notify-enabled">
+      </label>
+      <label class="setting-row">
+        <span>Threshold (%)</span>
+        <input type="number" id="notify-threshold" min="1" max="100" step="1">
+      </label>
+    </div>
     <p class="auto-update-info">Auto-updates every 5 minutes</p>
     <a href="https://claude.ai/settings/usage" target="_blank" class="settings-link">Open Usage Page</a>
     <div class="author">
       by <a href="https://www.linkedin.com/in/izamiatin/" target="_blank" class="author-link">Igor Zamiatin</a>
     </div>
   </div>
-  <script src="popup.js"></script>
+  <script type="module" src="popup.js"></script>
 </body>
 </html>

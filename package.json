@@ -1,0 +1,10 @@
+{
+  "name": "0tokens",
+  "version": "1.2.2",
+  "private": true,
+  "type": "module",
+  "description": "Dev-only tooling for the 0Tokens extension (tests). Not shipped in the Web Store zip.",
+  "scripts": {
+    "test": "node --test"
+  }
+}

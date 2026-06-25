@@ -1,4 +1,6 @@
 // Background service worker for automatic updates and notifications
+import { shouldNotify, colorForPercent } from './lib.js';
+
 chrome.action.setTitle({ title: "Claude Usage" });
 
 const COLORS = {
@@ -8,7 +10,14 @@ const COLORS = {
   GRAY: '#999999'
 };
 
-let lastNotificationLevel = 0;
+const BAND_COLORS = {
+  green: COLORS.GREEN,
+  orange: COLORS.ORANGE,
+  red: COLORS.RED
+};
+
+const DEFAULT_NOTIFY_ENABLED = true;
+const DEFAULT_NOTIFY_THRESHOLD = 80;
 
 // Update every 5 minutes
 chrome.alarms.create('autoUpdate', { periodInMinutes: 5 });
@@ -105,38 +114,40 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
 function updateBadge(percent) {
   chrome.action.setBadgeText({ text: `${percent}` });
-
-  let color = COLORS.GREEN;
-  if (percent > 50) color = COLORS.ORANGE;
-  if (percent > 80) color = COLORS.RED;
-
-  chrome.action.setBadgeBackgroundColor({ color });
+  chrome.action.setBadgeBackgroundColor({ color: BAND_COLORS[colorForPercent(percent)] });
 }
 
-function checkAndNotify(percent) {
-  const levels = [
-    { threshold: 80, id: 'limit80', message: "You've used 80% of your Claude limit" },
-    { threshold: 90, id: 'limit90', message: "You've used 90% of your Claude limit" },
-    { threshold: 95, id: 'limit95', message: "You've used 95% of your Claude limit!" }
-  ];
+async function checkAndNotify(percent) {
+  // All state lives in storage — the service worker can be killed between alarms,
+  // so an in-memory flag would not survive.
+  const {
+    notifyEnabled = DEFAULT_NOTIFY_ENABLED,
+    notifyThreshold = DEFAULT_NOTIFY_THRESHOLD,
+    notifiedAtThreshold = false
+  } = await chrome.storage.local.get([
+    'notifyEnabled',
+    'notifyThreshold',
+    'notifiedAtThreshold'
+  ]);
 
-  for (const level of levels) {
-    if (percent >= level.threshold && lastNotificationLevel < level.threshold) {
-      chrome.notifications.create(level.id, {
-        type: 'basic',
-        iconUrl: 'icons/icon128.png',
-        title: 'Claude Usage Alert',
-        message: level.message,
-        priority: 2
-      });
-      lastNotificationLevel = level.threshold;
-      break;
-    }
+  const result = shouldNotify({
+    percent,
+    threshold: notifyThreshold,
+    enabled: notifyEnabled,
+    alreadyNotified: notifiedAtThreshold
+  });
+
+  if (result.notify) {
+    chrome.notifications.create('limitThreshold', {
+      type: 'basic',
+      iconUrl: 'icons/icon128.png',
+      title: 'Claude Usage Alert',
+      message: `You've used ${percent}% of your Claude limit`,
+      priority: 2
+    });
   }
 
-  if (percent < 80) {
-    lastNotificationLevel = 0;
-  }
+  await chrome.storage.local.set({ notifiedAtThreshold: result.notified });
 }
 
 function initializeBadge() {
