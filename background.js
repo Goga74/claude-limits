@@ -19,6 +19,77 @@ const BAND_COLORS = {
 const DEFAULT_NOTIFY_ENABLED = true;
 const DEFAULT_NOTIFY_THRESHOLD = 80;
 
+// Track tabs the extension itself opened for auto-refresh, so we only auto-close
+// those — never a tab the user opened manually (e.g. via "Open Usage Page").
+// The service worker can be terminated between opening a tab and receiving its
+// USAGE_DATA message, which would empty an in-memory Set, so we ALSO persist to
+// chrome.storage.session (cleared on browser restart, never written to disk).
+// storage.session is the source of truth; the Set is a fast in-memory mirror.
+const AUTO_OPENED_KEY = 'autoOpenedTabIds';
+const autoOpenedTabIds = new Set();
+
+function sessionStorageAvailable() {
+  return !!(chrome.storage && chrome.storage.session);
+}
+
+// Refresh the in-memory mirror from storage.session (the source of truth).
+async function loadAutoOpened() {
+  if (!sessionStorageAvailable()) return;
+  try {
+    const result = await chrome.storage.session.get(AUTO_OPENED_KEY);
+    const ids = Array.isArray(result[AUTO_OPENED_KEY]) ? result[AUTO_OPENED_KEY] : [];
+    autoOpenedTabIds.clear();
+    for (const id of ids) autoOpenedTabIds.add(id);
+  } catch (e) {
+    // storage.session unavailable — keep the in-memory mirror as-is.
+  }
+}
+
+async function persistAutoOpened() {
+  if (!sessionStorageAvailable()) return;
+  try {
+    await chrome.storage.session.set({ [AUTO_OPENED_KEY]: [...autoOpenedTabIds] });
+  } catch (e) {
+    // In-memory only.
+  }
+}
+
+async function markAutoOpened(tabId) {
+  if (tabId === undefined || tabId === null) return;
+  await loadAutoOpened();
+  autoOpenedTabIds.add(tabId);
+  await persistAutoOpened();
+}
+
+async function isAutoOpened(tabId) {
+  if (tabId === undefined || tabId === null) return false;
+  await loadAutoOpened();
+  return autoOpenedTabIds.has(tabId);
+}
+
+async function unmarkAutoOpened(tabId) {
+  if (tabId === undefined || tabId === null) return;
+  await loadAutoOpened();
+  autoOpenedTabIds.delete(tabId);
+  await persistAutoOpened();
+}
+
+// Close a tab only if the extension auto-opened it; always drop the id afterward.
+async function maybeCloseAutoOpenedTab(tabId) {
+  if (tabId === undefined || tabId === null) return;
+  try {
+    if (await isAutoOpened(tabId)) {
+      try {
+        await chrome.tabs.remove(tabId);
+      } catch (e) {
+        // Tab might already be closed.
+      }
+    }
+  } finally {
+    await unmarkAutoOpened(tabId);
+  }
+}
+
 // Update every 5 minutes
 chrome.alarms.create('autoUpdate', { periodInMinutes: 5 });
 
@@ -53,23 +124,51 @@ async function updateUsageData() {
     });
 
     if (existingTabs.length > 0) {
+      // Fast path: a usage tab is already open. It may be the user's own tab, so
+      // reload it to refresh data but do NOT mark it auto-opened — it must stay open.
       await chrome.tabs.reload(existingTabs[0].id);
       return;
     }
 
-    // Open usage page in a background tab (invisible to user)
-    const tab = await chrome.tabs.create({
-      url: 'https://claude.ai/settings/usage',
-      active: false
-    });
+    // A service worker has no "current window", so chrome.tabs.create() without an
+    // explicit windowId throws "No current window". Resolve a real normal window first.
+    let windowId;
+    try {
+      const win = await chrome.windows.getLastFocused({ windowTypes: ['normal'] });
+      if (win && win.id !== chrome.windows.WINDOW_ID_NONE) windowId = win.id;
+    } catch (e) {
+      // No normal window available
+    }
 
-    // Safety timeout: close tab after 10 seconds even if no data received
-    setTimeout(async () => {
-      try {
-        await chrome.tabs.remove(tab.id);
-      } catch (e) {
-        // Tab might be already closed by onMessage handler
-      }
+    let tab;
+    if (windowId !== undefined) {
+      // Normal window exists: open the usage page as a background tab inside it.
+      tab = await chrome.tabs.create({
+        url: 'https://claude.ai/settings/usage',
+        active: false,
+        windowId
+      });
+    } else {
+      // No normal window open at all: fall back to a minimized popup window.
+      // No bounds (width/height/left/top) — they are forbidden with state:'minimized'.
+      const win = await chrome.windows.create({
+        url: 'https://claude.ai/settings/usage',
+        type: 'popup',
+        state: 'minimized'
+      });
+      tab = win.tabs && win.tabs[0];
+    }
+
+    // Record the tab we just opened so only it is eligible for auto-close.
+    if (tab && tab.id !== undefined) {
+      await markAutoOpened(tab.id);
+    }
+
+    // Safety timeout: close the created page after 10 seconds even if no data
+    // received, but only if it is still marked auto-opened. Removing the lone tab
+    // of the fallback popup closes that window too.
+    setTimeout(() => {
+      if (tab) maybeCloseAutoOpenedTab(tab.id);
     }, 10000);
 
   } catch (error) {
@@ -94,13 +193,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
       checkAndNotify(data.percent);
 
-      // Close the background tab as soon as data is received
+      // Close the tab as soon as data is received — but ONLY if the extension
+      // auto-opened it. A tab the user opened manually must stay open.
       if (sender.tab) {
-        try {
-          chrome.tabs.remove(sender.tab.id).catch(() => {});
-        } catch (e) {
-          // Tab might be already closed
-        }
+        maybeCloseAutoOpenedTab(sender.tab.id);
       }
     } else {
       chrome.action.setBadgeText({ text: '?' });
@@ -110,6 +206,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     sendResponse({ success: true });
   }
   return true;
+});
+
+// Drop ids of tabs closed by any means (e.g. the user) so the set never leaks.
+chrome.tabs.onRemoved.addListener((tabId) => {
+  unmarkAutoOpened(tabId);
 });
 
 function updateBadge(percent) {
