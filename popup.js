@@ -32,8 +32,19 @@ function formatLastUpdated(timestamp) {
   return `Updated ${new Date(timestamp).toLocaleDateString()}`;
 }
 
+// Timestamp currently being displayed; null when the label holds static text
+// (no data / not logged in), so the live tick doesn't overwrite those messages.
+let currentLastUpdated = null;
+
+// Re-render the relative "Updated N min ago" label from the stored timestamp.
+function renderLastUpdated() {
+  if (!currentLastUpdated) return;
+  lastUpdated.textContent = formatLastUpdated(currentLastUpdated);
+}
+
 function displayUsage(data) {
   if (!data) {
+    currentLastUpdated = null;
     percentValue.textContent = '?';
     statusText.textContent = 'No data yet';
     lastUpdated.textContent = 'Waiting for first update...';
@@ -42,11 +53,13 @@ function displayUsage(data) {
   }
 
   if (data.loggedIn) {
+    currentLastUpdated = data.lastUpdated;
     percentValue.textContent = data.percent;
     statusText.textContent = 'of your limit used';
-    lastUpdated.textContent = formatLastUpdated(data.lastUpdated);
+    renderLastUpdated();
     usageDisplay.className = 'usage-display ' + getUsageClass(data.percent);
   } else {
+    currentLastUpdated = null;
     percentValue.textContent = '?';
     statusText.textContent = 'Not logged in to Claude';
     lastUpdated.textContent = 'Please log in at claude.ai';
@@ -89,3 +102,13 @@ notifyThresholdEl.addEventListener('change', () => {
 // Initialize
 loadStoredData();
 loadSettings();
+
+// Keep the "Updated N min ago" label ticking while the popup stays open.
+const lastUpdatedTimer = setInterval(renderLastUpdated, 30000);
+
+function stopLastUpdatedTimer() {
+  clearInterval(lastUpdatedTimer);
+}
+
+window.addEventListener('pagehide', stopLastUpdatedTimer);
+window.addEventListener('unload', stopLastUpdatedTimer);
